@@ -1,8 +1,12 @@
 package com.ll.chatApp.domain.article.article.controller;
 
+import com.ll.chatApp.domain.article.article.dto.ArticleDto;
+import com.ll.chatApp.domain.article.article.dto.ArticleModifyRequest;
+import com.ll.chatApp.domain.article.article.dto.ArticleWriteRequest;
 import com.ll.chatApp.domain.article.article.entity.Article;
 import com.ll.chatApp.domain.article.article.service.ArticleService;
 import com.ll.chatApp.global.rsData.RsData;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,28 +18,52 @@ import java.util.List;
 public class ApiV1ArticleController {
     private final ArticleService articleService;
 
+    /*
+    * 설계 한다면 어디서부터 출발해야 할까?
+    *
+    *
+    * 일단 유저 엔티티.  userName, userId(@Id걸림)
+    *
+    * */
     @GetMapping
-    public List<Article> getArticles() {
-        return articleService.findAll();
+    public List<ArticleDto> getArticles() {
+        List<Article> articles = articleService.findAll();
+        List<ArticleDto> articleDtoList = articles.stream()
+                .map(ArticleDto::new)
+                .toList();
+
+        return articleDtoList;
     }
 
     @GetMapping({"/{id}"})
-    private Article getArticle(@PathVariable("id") Long id) {
-        return articleService.findById(id).get();
+    private ArticleDto getArticle(@PathVariable("id") Long id) {
+        //orElseGet(Article::new) 가 뭐지?
+        Article article = articleService.findById(id).orElseGet(Article::new);
+        return new ArticleDto(article);
     }
 
     @PostMapping
-    public RsData writeArticle(@RequestBody Article article) {
-        return articleService.write(article.getAuthor().getId(), article.getTitle(), article.getContent());
+    public RsData writeArticle(@Valid @RequestBody ArticleWriteRequest req) {
+        Article article =  articleService.write(req.getTitle(), req.getContent());
+        ArticleDto articleDto = new ArticleDto(article);
+
+        return RsData.of("200"
+                         , "게시글 작성완료"
+                         , new ArticleDto(article));
     }
 
     @PatchMapping({"/{id}"})
-    public void updateArticle(@PathVariable("id") Long id, @RequestBody Article article) {
-        this.articleService.modify(article, article.getTitle(), article.getContent());
+    public RsData<ArticleDto> updateArticle(@PathVariable("id") Long id, @Valid @RequestBody ArticleModifyRequest req) {
+        Article article = this.articleService.findById(id).orElseGet(null);
+        Article modifiedArticle = this.articleService.modify(article, req.getTitle(), req.getContent());
+        return RsData.of("200", "게시물 수정 성공", new ArticleDto((modifiedArticle)));
     }
 
     @DeleteMapping({"/{id}"})
-    public void deleteArticle(@PathVariable("id") Long id) {
+    public RsData<Void> deleteArticle(@PathVariable("id") Long id) {
         this.articleService.delete(id);
+        return RsData.of("200"
+                , "게시글 작성완료"
+                , null);
     }
 }

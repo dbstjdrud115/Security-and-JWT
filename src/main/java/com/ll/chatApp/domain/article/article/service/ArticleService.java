@@ -4,7 +4,6 @@ import com.ll.chatApp.domain.article.article.entity.Article;
 import com.ll.chatApp.domain.article.article.repository.ArticleRepository;
 import com.ll.chatApp.domain.article.articleComment.entity.ArticleComment;
 import com.ll.chatApp.domain.member.member.entity.Member;
-import com.ll.chatApp.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,16 +18,14 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
 
     @Transactional
-    public RsData<Article> write(Long memberId, String title, String content) {
+    public Article write(String title, String content) {
         Article article = Article.builder()
-                .author(Member.builder().id(memberId).build())
+                .author(Member.builder().id(1L).build())
                 .title(title)
                 .content(content)
                 .build();
 
-        articleRepository.save(article);
-
-        return RsData.of("200", "글 작성 성공", article);
+        return articleRepository.save(article);
     }
 
     public Optional<Article> findById(Long id) {
@@ -36,9 +33,10 @@ public class ArticleService {
     }
 
     @Transactional
-    public void modify(Article article, String title, String content) {
+    public Article modify(Article article, String title, String content) {
         article.setTitle(title);
         article.setContent(content);
+        return article;
     }
 
     @Transactional
@@ -50,6 +48,7 @@ public class ArticleService {
         return articleRepository.findAll();
     }
 
+    @Transactional
     public void delete(Long id) {
         this.articleRepository.deleteById(id);
     }
