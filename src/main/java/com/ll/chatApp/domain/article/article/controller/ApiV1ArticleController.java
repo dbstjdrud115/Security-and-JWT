@@ -47,22 +47,23 @@ public class ApiV1ArticleController {
         Article article =  articleService.write(req.getTitle(), req.getContent());
         ArticleDto articleDto = new ArticleDto(article);
 
-        return RsData.of("200"
-                         , "게시글 작성완료"
-                         , new ArticleDto(article));
+        return new RsData<>(
+                "200",
+                "게시글이 작성에 성공하였습니다.",
+                new ArticleDto(article));
     }
 
     @PatchMapping({"/{id}"})
     public RsData<ArticleDto> updateArticle(@PathVariable("id") Long id, @Valid @RequestBody ArticleModifyRequest req) {
         Article article = this.articleService.findById(id).orElseGet(null);
         Article modifiedArticle = this.articleService.modify(article, req.getTitle(), req.getContent());
-        return RsData.of("200", "게시물 수정 성공", new ArticleDto((modifiedArticle)));
+        return new RsData<>("200", "게시물 수정 성공", new ArticleDto((modifiedArticle)));
     }
 
     @DeleteMapping({"/{id}"})
     public RsData<Void> deleteArticle(@PathVariable("id") Long id) {
         this.articleService.delete(id);
-        return RsData.of("200"
+        return new RsData<>("200"
                 , "게시글 작성완료"
                 , null);
     }
