@@ -130,6 +130,23 @@ public class ArticleServiceTest {
         System.out.println(article1);
     }
 
+
+    /*
+     * 11번 테스트부터는 JPA에서 제공하지 않는 API를 사용하고 있다.
+     *
+     * 예를들어 11번 테스트는 findByAuthorId라는, JpaRepository에서 제공하지 않는
+     * API를 사용하고 있는데, 신기한건 그게 또 동작을 한다는것이다.
+     *
+     * 이 이유는, Spring Data JPA의 메서드 이름 기반 쿼리 생성 기능덕분에 가능하다.
+     * 일단 기본형인 findBy를 베이스로 뒤에 나오는 AuthorId를 해석한다음,
+     * 기존의 방식대로 쿼리를 자동으로 작성하고 실행한다.
+     * 이 기능이 동작하려면 내가 찾으려는 Entity에 해당 필드값이 선언되어있어야 한다.,
+     *
+     * 그리고 Spring Data Jpa의 명명만으로도 한계가 발생한다.
+     * 그 다음에 등장한것이  QueryDSL인데,  Impl. cumstom을 참고할것.bui
+     *
+     * */
+
     @DisplayName("1번 회원이 작성한 댓글들")
     @Test
     void t11() {

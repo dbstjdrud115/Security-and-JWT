@@ -21,4 +21,6 @@ public class Member extends BaseEntity {
     String username;
     @JsonIgnore
     String password;
+    @JsonIgnore
+    private String refreshToken;
 }

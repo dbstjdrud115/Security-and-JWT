@@ -8,6 +8,8 @@ import com.ll.chatApp.domain.article.article.service.ArticleService;
 import com.ll.chatApp.global.rsData.RsData;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,14 +45,19 @@ public class ApiV1ArticleController {
     }
 
     @PostMapping
-    public RsData writeArticle(@Valid @RequestBody ArticleWriteRequest req) {
+    public ResponseEntity<RsData<ArticleDto>> writeArticle(@Valid @RequestBody ArticleWriteRequest req) {
+
         Article article =  articleService.write(req.getTitle(), req.getContent());
         ArticleDto articleDto = new ArticleDto(article);
 
-        return new RsData<>(
-                "200",
-                "게시글이 작성에 성공하였습니다.",
-                new ArticleDto(article));
+        /*ResponseEntity는 좀 더 명료한 상태코드값을 회신해준다.
+        * 또한 제네릭타입을 받기에, 원하는 데이터를 body에 담을수도 있다.
+        * */
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new RsData<>(
+                        "200",
+                        "게시글이 작성에 성공하였습니다.",
+                        new ArticleDto(article)));
     }
 
     @PatchMapping({"/{id}"})
